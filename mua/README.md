@@ -1,54 +1,90 @@
-# React + TypeScript + Vite
+# Moody's Underwriting Assistant (MUA)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Project Overview
+MUA is an interactive frontend prototype designed to assist commercial casualty underwriters in their decision-making process. The tool provides a comprehensive view of submission data, risk analysis, and quote recommendations.
 
-Currently, two official plugins are available:
+## Development Phases
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Phase 1: Frontend UI/UX Build with Mock Data
+- Build complete UI/UX flows using mock data
+- Focus on visual presentation and navigation
+- Implement all core screens and components
+- No backend integration required
 
-## Expanding the ESLint configuration
+### Phase 2: Future Integration (Out of Scope for Now)
+- Potential mock API endpoints
+- Dynamic data retrieval simulation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Technology Stack
+- Frontend Framework: React
+- Styling: Tailwind CSS
+- State Management: React Context API
+- Component Architecture: Functional Components with Hooks
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Project Structure
+```
+mua/
+├── src/                    # Source code
+│   ├── components/         # Reusable UI components
+│   ├── screens/           # Main application screens
+│   ├── context/           # React Context providers
+│   ├── data/              # Mock data and types
+│   ├── styles/            # Global styles and Tailwind config
+│   └── utils/             # Helper functions and utilities
+├── public/                # Static assets
+├── docs/                  # Project documentation
+└── tests/                 # Test files
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Core Features Implementation
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 1. Dashboard Screen
+- Submission overview table
+- Sorting and filtering capabilities
+- Navigation to submission details
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+### 2. Submission Dossier Screen
+- Comprehensive submission overview
+- Tabbed navigation for different sections
+- Interactive risk analysis display
+- Quote recommendation interface
+
+### 3. "Ask MUA" Feature
+- Interactive Q&A interface
+- Pre-defined question suggestions
+- Mock response system
+
+## Development Guidelines
+1. Mobile-first responsive design
+2. Component-based architecture
+3. Clear separation of concerns
+4. Comprehensive documentation
+5. Regular testing and validation
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+
+### Installation
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm start
+   ```
+
+### Running Tests
+```bash
+npm test
 ```
+
+## Contributing
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details 
