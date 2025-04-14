@@ -1,26 +1,75 @@
-# Model Context Protocol (MCP) Setup Guide
+# MCP (Model Context Protocol) Setup Guide
 
 ## Project Structure
-The MCP implementation must follow this exact directory structure:
+
+The MCP implementation is organized as follows:
 
 ```
-mua/                      # Root project directory
-├── src/                  # React application source
-│   ├── hooks/            # React hooks
-│   │   └── useMCP.ts     # MCP React hook
-│   └── utils/            # Utility functions
-│       └── mcpClient.ts  # MCP client implementation
-│
-└── mcp/                  # MCP server implementation
-    ├── server/           # Server-side code
-    │   ├── mcpServer.ts  # Main server implementation
-    │   └── index.ts      # Server entry point
-    ├── types/            # TypeScript type definitions
-    │   └── mcpTypes.ts   # MCP type definitions
-    ├── models/           # Data models
-    ├── utils/            # Utility functions
-    └── handlers/         # Message and error handlers
+mua/
+├── mcp/
+│   ├── server/
+│   │   ├── index.ts
+│   │   └── mcpServer.ts
+│   ├── types/
+│   │   └── mcpTypes.ts
+│   ├── utils/
+│   │   ├── validation.ts
+│   │   └── logger.ts
+│   └── handlers/
+│       ├── messageHandler.ts
+│       └── errorHandler.ts
+└── src/
+    ├── utils/
+    │   └── mcpClient.ts
+    └── hooks/
+        └── useMCP.ts
 ```
+
+## Configuration
+
+1. **Path Aliases**
+   - The project uses path aliases for cleaner imports
+   - `@mcp/*` points to the `mcp` directory
+   - `@/*` points to the `src` directory
+
+2. **TypeScript Configuration**
+   - Path aliases are configured in both `tsconfig.json` and `vite.config.ts`
+   - The MCP server uses `ts-node` for TypeScript execution
+
+## Usage
+
+1. **Starting the MCP Server**
+   ```bash
+   npm run mcp-server
+   ```
+
+2. **Using the MCP Client**
+   ```typescript
+   import { useMCP } from '@/hooks/useMCP';
+
+   const MyComponent = () => {
+     const { trackComponentAdded } = useMCP();
+     // Use MCP functionality
+   };
+   ```
+
+## WebSocket Communication
+
+- The MCP server runs on port 8080
+- The client automatically handles reconnection (up to 5 attempts)
+- Messages are queued if the connection is lost
+
+## Error Handling
+
+- All errors are logged with appropriate context
+- The client includes automatic reconnection logic
+- The server validates all incoming messages
+
+## Development Notes
+
+1. Always use path aliases (`@mcp/*` and `@/*`) for imports
+2. The MCP server must be running for the client to work
+3. Check the console for connection status and errors
 
 ## Important Notes
 1. **Directory Location**: All MCP-related files must be created within the `mua` directory, NOT in the root directory.

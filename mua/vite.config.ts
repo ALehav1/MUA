@@ -10,6 +10,13 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@mcp': path.resolve(__dirname, './mcp')
     },
+  },
+  build: {
+    sourcemap: true,
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'],
   },
 }); 

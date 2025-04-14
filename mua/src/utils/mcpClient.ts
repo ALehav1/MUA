@@ -1,4 +1,4 @@
-import { MCPMessageType, MCPMessage } from "../types/mcpTypes";
+import { MCPMessageType, MCPMessage } from "../../mcp/types/mcpTypes";
 
 class MCPClient {
   private ws: WebSocket | null = null;

@@ -84,15 +84,23 @@ export class MCPServer extends EventEmitter {
     super();
     this.config.port = port;
     this.wss = new WebSocketServer({ port });
+    this.setupWebSocket();
   }
 
-  public start(): void {
+  private setupWebSocket(): void {
     this.wss.on('connection', (ws: WebSocket) => {
       console.log('[INFO] New client connected');
       
       ws.on('message', (data: string) => {
         try {
-          const message = JSON.parse(data) as MCPMessage;
+          const message = JSON.parse(data.toString()) as MCPMessage;
+          const validationResult = validateMCPMessage(message);
+          
+          if (!validationResult.isValid && validationResult.errors) {
+            console.error('[ERROR] Invalid message:', validationResult.errors.join(', '));
+            return;
+          }
+          
           this.handleMessage(message, ws);
         } catch (error) {
           console.error('[ERROR] Error in handleMessage:', error);
@@ -103,12 +111,7 @@ export class MCPServer extends EventEmitter {
       ws.on('close', () => {
         console.log('[INFO] Client disconnected');
       });
-
-      // Send initial state
-      this.sendState(ws);
     });
-
-    console.log(`[INFO] MCP Server started on port ${this.config.port}`);
   }
 
   private handleMessage(message: MCPMessage, ws: WebSocket): void {
@@ -165,6 +168,10 @@ export class MCPServer extends EventEmitter {
         }));
       }
     });
+  }
+
+  public start(): void {
+    console.log(`[INFO] MCP Server started on port ${this.config.port}`);
   }
 }
 

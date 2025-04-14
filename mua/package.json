@@ -8,15 +8,17 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "mcp-server": "ts-node --esm mcp/server/index.ts"
+    "mcp-server": "ts-node mcp/server/index.ts",
+    "start": "concurrently \"npm run dev\" \"npm run mcp-server\""
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "@types/ws": "^8.18.1",
+    "@types/ws": "^8.5.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.1",
-    "ws": "^8.18.1"
+    "react-router-dom": "^6.22.0",
+    "ws": "^8.16.0",
+    "events": "^3.3.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.2",
@@ -29,6 +31,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
+    "concurrently": "^8.2.2",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.33.2",
