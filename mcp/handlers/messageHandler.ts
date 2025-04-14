@@ -1,19 +1,26 @@
 import { MCPMessage, MCPMessageType } from '../types/mcpTypes';
 import { logger } from '../utils/logger';
+import { validateMCPMessage } from '../utils/validation';
 
-export async function handleMCPMessage(message: MCPMessage, clientId: string): Promise<void> {
+export async function handleMCPMessage(message: MCPMessage): Promise<void> {
+  const validation = validateMCPMessage(message);
+  
+  if (!validation.isValid) {
+    logger.error('Invalid message received', validation.errors);
+    return;
+  }
+
+  if (validation.warnings) {
+    logger.warn('Message validation warnings', validation.warnings);
+  }
+
   try {
-    logger.info(`Processing message from ${clientId}:`, message);
-
     switch (message.type) {
       case MCPMessageType.FILE_MODIFIED:
         await handleFileModified(message.payload);
         break;
       case MCPMessageType.COMPONENT_ADDED:
         await handleComponentAdded(message.payload);
-        break;
-      case MCPMessageType.COMPONENT_REMOVED:
-        await handleComponentRemoved(message.payload);
         break;
       case MCPMessageType.DEPENDENCY_ADDED:
         await handleDependencyAdded(message.payload);
@@ -30,71 +37,45 @@ export async function handleMCPMessage(message: MCPMessage, clientId: string): P
       case MCPMessageType.INITIAL_STATE_VALIDATION:
         await handleInitialStateValidation(message.payload);
         break;
-      case MCPMessageType.STATE_CHANGED:
-        await handleStateChanged(message.payload);
-        break;
-      case MCPMessageType.USER_INTERACTION:
-        await handleUserInteraction(message.payload);
-        break;
-      case MCPMessageType.DATA_FLOW:
-        await handleDataFlow(message.payload);
-        break;
-      case MCPMessageType.PERFORMANCE_METRIC:
-        await handlePerformanceMetric(message.payload);
-        break;
       default:
-        logger.warn(`Unknown message type: ${message.type}`);
+        logger.warn(`Unhandled message type: ${message.type}`);
     }
   } catch (error) {
-    logger.error('Error handling message:', error);
-    throw error;
+    logger.error(`Error handling message type ${message.type}:`, error);
   }
 }
 
 async function handleFileModified(payload: any): Promise<void> {
+  // Implementation for file modification handling
   logger.info('File modified:', payload);
 }
 
 async function handleComponentAdded(payload: any): Promise<void> {
+  // Implementation for component addition handling
   logger.info('Component added:', payload);
 }
 
-async function handleComponentRemoved(payload: any): Promise<void> {
-  logger.info('Component removed:', payload);
-}
-
 async function handleDependencyAdded(payload: any): Promise<void> {
+  // Implementation for dependency addition handling
   logger.info('Dependency added:', payload);
 }
 
 async function handleDocumentationUpdated(payload: any): Promise<void> {
+  // Implementation for documentation update handling
   logger.info('Documentation updated:', payload);
 }
 
 async function handleTestAdded(payload: any): Promise<void> {
+  // Implementation for test addition handling
   logger.info('Test added:', payload);
 }
 
 async function handleConfigChanged(payload: any): Promise<void> {
+  // Implementation for configuration change handling
   logger.info('Configuration changed:', payload);
 }
 
 async function handleInitialStateValidation(payload: any): Promise<void> {
+  // Implementation for initial state validation
   logger.info('Initial state validation:', payload);
-}
-
-async function handleStateChanged(payload: any): Promise<void> {
-  logger.info('State changed:', payload);
-}
-
-async function handleUserInteraction(payload: any): Promise<void> {
-  logger.info('User interaction:', payload);
-}
-
-async function handleDataFlow(payload: any): Promise<void> {
-  logger.info('Data flow:', payload);
-}
-
-async function handlePerformanceMetric(payload: any): Promise<void> {
-  logger.info('Performance metric:', payload);
 } 

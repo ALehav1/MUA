@@ -1,8 +1,11 @@
 import { logger } from '../utils/logger';
 
-export function handleError(error: unknown, context?: string): Error {
-  const err = error instanceof Error ? error : new Error(String(error));
-  const message = context ? `${context}: ${err.message}` : err.message;
-  logger.error(message);
-  return err;
+export function handleError(error: unknown, context: string): void {
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  const stackTrace = error instanceof Error ? error.stack : undefined;
+
+  logger.error(`Error in ${context}: ${errorMessage}`);
+  if (stackTrace) {
+    logger.debug(`Stack trace: ${stackTrace}`);
+  }
 } 

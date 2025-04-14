@@ -1,165 +1,79 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mockSubmissions } from '../data/mockData';
-import { StatusBadge } from '../components/common/StatusBadge';
-import { useMCP } from '../hooks/useMCP';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { trackComponentAdded } = useMCP();
 
-  React.useEffect(() => {
-    trackComponentAdded('Dashboard', 'src/screens/Dashboard.tsx', ['StatusBadge']);
-  }, [trackComponentAdded]);
-
-  // Get recent submissions (last 3)
-  const recentSubmissions = mockSubmissions.slice(0, 3);
-
-  // Get submissions that need review
-  const pendingReviews = mockSubmissions.filter(
-    submission => submission.status === 'In Review' || submission.status === 'Needs Info'
-  );
-
-  // Calculate key metrics
-  const totalSubmissions = mockSubmissions.length;
-  const averageRiskScore = mockSubmissions.reduce((acc, curr) => acc + curr.riskAnalysis.overallScore, 0) / totalSubmissions;
-  const highRiskSubmissions = mockSubmissions.filter(sub => sub.riskAnalysis.overallScore < 60).length;
-
-  const handleViewSubmission = (submissionId: string) => {
+  const handleRowClick = (submissionId: string) => {
     navigate(`/submission/${submissionId}`);
   };
 
-  const handleViewAllSubmissions = () => {
-    navigate('/submissions');
-  };
-
   return (
-    <div className="space-y-6">
-      <div className="sm:flex sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-        <button
-          onClick={handleViewAllSubmissions}
-          className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
-        >
-          View All Submissions
-        </button>
+    <div className="bg-white shadow rounded-lg">
+      <div className="px-4 py-5 sm:px-6">
+        <h2 className="text-lg font-medium text-gray-900">Submissions</h2>
       </div>
-
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-        <div className="rounded-lg bg-white p-6 shadow">
-          <h2 className="text-lg font-medium text-gray-900">Total Submissions</h2>
-          <p className="mt-2 text-3xl font-semibold text-indigo-600">{totalSubmissions}</p>
-        </div>
-        <div className="rounded-lg bg-white p-6 shadow">
-          <h2 className="text-lg font-medium text-gray-900">Average Risk Score</h2>
-          <p className="mt-2 text-3xl font-semibold text-indigo-600">{averageRiskScore.toFixed(1)}</p>
-        </div>
-        <div className="rounded-lg bg-white p-6 shadow">
-          <h2 className="text-lg font-medium text-gray-900">High Risk Submissions</h2>
-          <p className="mt-2 text-3xl font-semibold text-red-600">{highRiskSubmissions}</p>
-        </div>
-      </div>
-
-      {/* Recent Submissions */}
-      <div className="rounded-lg bg-white shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Recent Submissions</h2>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {recentSubmissions.map((submission) => (
-            <div
-              key={submission.submissionId}
-              className="px-6 py-4 hover:bg-gray-50 cursor-pointer"
-              onClick={() => handleViewSubmission(submission.submissionId)}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-medium text-indigo-600">{submission.insuredName}</h3>
-                  <p className="text-sm text-gray-500">{submission.lineOfBusiness}</p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <StatusBadge status={submission.status} />
-                  <span className={`text-sm font-medium ${
-                    submission.riskAnalysis.overallScore >= 75 ? 'text-green-600' :
-                    submission.riskAnalysis.overallScore >= 60 ? 'text-yellow-600' :
-                    'text-red-600'
-                  }`}>
-                    Risk Score: {submission.riskAnalysis.overallScore}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Pending Reviews */}
-      <div className="rounded-lg bg-white shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Pending Reviews</h2>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {pendingReviews.length > 0 ? (
-            pendingReviews.map((submission) => (
-              <div
+      <div className="border-t border-gray-200">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Insured Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Submission ID
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Risk Score
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Date Received
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Broker
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {mockSubmissions.map((submission) => (
+              <tr
                 key={submission.submissionId}
-                className="px-6 py-4 hover:bg-gray-50 cursor-pointer"
-                onClick={() => handleViewSubmission(submission.submissionId)}
+                onClick={() => handleRowClick(submission.submissionId)}
+                className="hover:bg-gray-50 cursor-pointer"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-medium text-indigo-600">{submission.insuredName}</h3>
-                    <p className="text-sm text-gray-500">{submission.lineOfBusiness}</p>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <StatusBadge status={submission.status} />
-                    <span className={`text-sm font-medium ${
-                      submission.riskAnalysis.overallScore >= 75 ? 'text-green-600' :
-                      submission.riskAnalysis.overallScore >= 60 ? 'text-yellow-600' :
-                      'text-red-600'
-                    }`}>
-                      Risk Score: {submission.riskAnalysis.overallScore}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="px-6 py-4 text-sm text-gray-500">
-              No pending reviews at this time
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="rounded-lg bg-white shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Quick Actions</h2>
-        </div>
-        <div className="px-6 py-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <button
-              onClick={() => navigate('/submissions')}
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            >
-              View All Submissions
-            </button>
-            <button
-              onClick={() => navigate('/quotes')}
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            >
-              Manage Quotes
-            </button>
-            <button
-              onClick={() => navigate('/risk-analysis')}
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            >
-              Risk Analysis
-            </button>
-          </div>
-        </div>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {submission.insuredName}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {submission.submissionId}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    submission.status === 'New' ? 'bg-blue-100 text-blue-800' :
+                    submission.status === 'In Review' ? 'bg-yellow-100 text-yellow-800' :
+                    submission.status === 'Quoted' ? 'bg-green-100 text-green-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {submission.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {submission.riskAnalysis.overallScore}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {new Date(submission.dateReceived).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {submission.broker}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

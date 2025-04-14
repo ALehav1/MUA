@@ -135,21 +135,6 @@ const SubmissionDossier: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-900">Submission Dossier</h1>
-      <div className="rounded-lg bg-white p-6 shadow">
-        <h2 className="text-lg font-medium text-gray-900">Submission #{id}</h2>
-        <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">Insured Information</h3>
-            <p className="mt-1 text-sm text-gray-900">Loading...</p>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">Risk Analysis</h3>
-            <p className="mt-1 text-sm text-gray-900">Loading...</p>
-          </div>
-        </div>
-      </div>
-
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">{submission.insuredName}</h2>
