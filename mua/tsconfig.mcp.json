@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "dist/mcp",
+    "rootDir": "mcp",
+    "baseUrl": ".",
+    "paths": {
+      "@mcp/*": ["mcp/*"]
+    },
+    "composite": true,
+    "declaration": true
+  },
+  "include": ["mcp/**/*"],
+  "exclude": ["node_modules"]
+} 

@@ -19,8 +19,11 @@
     "paths": {
       "@/*": ["src/*"],
       "@mcp/*": ["mcp/*"]
-    }
+    },
+    "outDir": "dist",
+    "declaration": true
   },
-  "include": ["src", "mcp"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src"],
+  "exclude": ["mcp/server/**/*"],
+  "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.mcp.json" }]
 }

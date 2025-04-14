@@ -1,25 +1,27 @@
-import { useCallback, useEffect } from "react";
-import { mcpClient } from "../utils/mcpClient";
+import { useCallback } from "react";
+import { mcpClient } from "@mcp/client/mcpClient";
+import { MCPMessageType, MCPMessage } from '@mcp/types/mcpTypes';
 
 export const useMCP = () => {
   const trackComponentAdded = useCallback((componentName: string, filePath: string, dependencies: string[]) => {
-    mcpClient.trackComponentAdded(componentName, filePath, dependencies);
+    mcpClient.sendMessage({
+      type: MCPMessageType.COMPONENT_ADDED,
+      payload: {
+        componentName,
+        filePath,
+        dependencies
+      },
+      timestamp: new Date().toISOString()
+    });
   }, []);
 
-  useEffect(() => {
-    // Initialize MCP client connection
-    const ws = mcpClient.getWebSocket();
-
-    return () => {
-      // Cleanup MCP client connection
-      if (ws) {
-        ws.close();
-      }
-    };
-  }, []);
+  const sendMessage = (message: MCPMessage) => {
+    mcpClient.sendMessage(message);
+  };
 
   return {
-    trackComponentAdded
+    trackComponentAdded,
+    sendMessage
   };
 };
 
