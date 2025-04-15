@@ -1,26 +1,27 @@
 import React from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import './styles/index.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './screens/Dashboard';
 import SubmissionDossier from './screens/SubmissionDossier';
+import NewSubmission from './screens/NewSubmission';
+import './App.css';
+import { RepoInput } from './components/RepoInput';
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Dashboard />,
-  },
-  {
-    path: '/submission/:id',
-    element: <SubmissionDossier />,
-  },
-], {
-  future: {
-    v7_relativeSplatPath: true
-  }
-});
+// MCP tracking and component context logic has been fully removed from user-facing code.
+// If MCP developer/automation tracking is needed, see src/devtools/MCPProvider.tsx and src/devtools/useMCP.ts.
 
-function App() {
-  return <RouterProvider router={router} />;
-}
+const App: React.FC = () => {
+  return (
+    <Router>
+      <div className="min-h-screen bg-gray-100">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/submissions/:id" element={<SubmissionDossier />} />
+          <Route path="/submissions/new" element={<NewSubmission />} />
+        </Routes>
+        <RepoInput />
+      </div>
+    </Router>
+  );
+};
 
-export default App; 
+export default App;

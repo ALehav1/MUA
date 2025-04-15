@@ -1,0 +1,51 @@
+[
+  {
+    "actor": "Cascade",
+    "action": "TEST_ACTION",
+    "component": "MCPMetaServer",
+    "rationale": "Demonstration of audit logging for user at 2025-04-15T10:02:32-04:00.",
+    "timestamp": "2025-04-15T14:02:39.882Z"
+  },
+  {
+    "actor": "Cascade",
+    "action": "COMPLIANCE_AUDIT",
+    "component": "auditCompliance.mcp.cjs",
+    "rationale": "Compliance audit FAILED: Component file does not follow PascalCase: useMCP.ts",
+    "timestamp": "2025-04-15T14:32:49.361Z"
+  },
+  {
+    "actor": "Cascade",
+    "action": "COMPLIANCE_AUDIT",
+    "component": "auditCompliance.mcp.cjs",
+    "rationale": "Compliance audit PASSED: All checks passed.",
+    "timestamp": "2025-04-15T14:36:00.081Z"
+  },
+  {
+    "actor": "Cascade",
+    "action": "COMPLIANCE_AUDIT",
+    "component": "auditCompliance.mcp.cjs",
+    "rationale": "Compliance audit FAILED: WARNING: Directory src/__tests__ is missing. TODO: Create this directory for all test files as per guidelines.",
+    "timestamp": "2025-04-15T14:44:35.567Z"
+  },
+  {
+    "actor": "Cascade",
+    "action": "COMPLIANCE_AUDIT",
+    "component": "auditCompliance.mcp.cjs",
+    "rationale": "Compliance audit FAILED: WARNING: Directory src/__tests__/test-utils/mocks/ is missing. TODO: Create and organize mocks by type (ui.tsx, api.ts, etc.).",
+    "timestamp": "2025-04-15T14:47:56.631Z"
+  },
+  {
+    "actor": "Cascade",
+    "action": "COMPLIANCE_AUDIT",
+    "component": "auditCompliance.mcp.cjs",
+    "rationale": "Compliance audit FAILED: WARNING: Test file index.ts does not follow naming convention (*.test.ts(x) or *.spec.ts(x)). TODO: Rename for clarity and compliance.",
+    "timestamp": "2025-04-15T14:48:27.228Z"
+  },
+  {
+    "actor": "Cascade",
+    "action": "COMPLIANCE_AUDIT",
+    "component": "auditCompliance.mcp.cjs",
+    "rationale": "Compliance audit PASSED: All checks passed.",
+    "timestamp": "2025-04-15T14:49:21.250Z"
+  }
+]

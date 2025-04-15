@@ -1,0 +1,20 @@
+{
+  "rules": [
+    "Always consult the MCP server before any codebase change.",
+    "Log all actions and rationale to the audit log.",
+    "Maintain clear documentation and up-to-date project plan.",
+    "No file or directory is changed without audit.",
+    "Follow project objectives and stepwise plan.",
+    "All test files must be in src/__tests__ or its subdirectories.",
+    "All mocks must be in src/__tests__/test-utils/mocks/ and separated by type (ui.tsx, api.ts, etc.).",
+    "All mocks must be exported via index.ts files.",
+    "All mocks must be TypeScript files.",
+    "Test files must be named *.test.ts(x) or *.spec.ts(x).",
+    "Test files must import mocks from central locations, not inline or hardcoded.",
+    "No duplicate mock implementations in the codebase.",
+    "No inline or hardcoded mock data in test files.",
+    "No mixed test types in the same file.",
+    "No implementation details in test assertions."
+  ],
+  "lastUpdated": "2025-04-15T10:39:45-04:00"
+}

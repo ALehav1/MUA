@@ -7,9 +7,28 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "target": "ESNext",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "types": ["node"],
-    "outDir": "dist"
+    "outDir": "dist",
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx"
   },
-  "include": ["vite.config.ts", "mcp/server/**/*"]
+  "include": [
+    "vite.config.ts",
+    "mcp/server/**/*",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "mcp/client/MCPClient.ts",
+    "mcp/server/MCPServer.ts",
+    "mcp/server/index.ts",
+    "mcp/models/auditModel.ts",
+    "mcp/models/contextModel.ts",
+    "mcp/models/fileModel.ts",
+    "mcp/models/guidelineModel.ts",
+    "mcp/models/planModel.ts",
+    "mcp/models/stateModel.ts",
+    "mcp/types/mcpTypes.ts",
+    "mcp/utils/logging.ts",
+    "mcp/utils/validation.ts"
+  ]
 }

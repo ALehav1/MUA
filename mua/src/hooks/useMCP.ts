@@ -1,28 +1,4 @@
-import { useCallback } from "react";
-import { mcpClient } from "@mcp/client/mcpClient";
-import { MCPMessageType, MCPMessage } from '@mcp/types/mcpTypes';
+// DEVELOPER NOTE: This file has moved. Implementation is now in src/devtools/useMCP.ts.
+// MCP is NOT a user-facing feature of MUA. This file is now a compatibility re-export for developer/automation only.
 
-export const useMCP = () => {
-  const trackComponentAdded = useCallback((componentName: string, filePath: string, dependencies: string[]) => {
-    mcpClient.sendMessage({
-      type: MCPMessageType.COMPONENT_ADDED,
-      payload: {
-        componentName,
-        filePath,
-        dependencies
-      },
-      timestamp: new Date().toISOString()
-    });
-  }, []);
-
-  const sendMessage = (message: MCPMessage) => {
-    mcpClient.sendMessage(message);
-  };
-
-  return {
-    trackComponentAdded,
-    sendMessage
-  };
-};
-
-export default useMCP; 
+export * from '../devtools/useMCP';

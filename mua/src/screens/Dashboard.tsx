@@ -1,16 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mockSubmissions } from '../data/mockData';
-import { useMCP } from '../hooks/useMCP';
+
+// MCP tracking and component context logic has been fully removed from user-facing code.
+// If MCP developer/automation tracking is needed, see src/devtools/MCPProvider.tsx and src/devtools/useMCP.ts.
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { trackComponentAdded } = useMCP();
-
-  useEffect(() => {
-    // Track component mount
-    trackComponentAdded('Dashboard', 'src/screens/Dashboard.tsx', []);
-  }, [trackComponentAdded]);
 
   const handleRowClick = (submissionId: string) => {
     navigate(`/submission/${submissionId}`);
@@ -171,4 +167,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

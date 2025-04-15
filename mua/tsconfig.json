@@ -4,12 +4,10 @@
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
     "noUnusedLocals": true,
@@ -18,12 +16,16 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@mcp/*": ["mcp/*"]
+      "@mcp/*": ["src/mcp/*"]
     },
-    "outDir": "dist",
-    "declaration": true
+    "allowJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true
   },
   "include": ["src"],
-  "exclude": ["mcp/server/**/*"],
-  "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.mcp.json" }]
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "./tsconfig.node.json" }
+  ]
 }

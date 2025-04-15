@@ -3,18 +3,20 @@
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "node",
-    "esModuleInterop": true,
+    "declaration": true,
+    "outDir": "./dist/mcp",
     "strict": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "dist/mcp",
-    "rootDir": "mcp",
+    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@mcp/*": ["mcp/*"]
+      "@mcp/*": ["src/mcp/*"]
     },
     "composite": true,
-    "declaration": true
+    "jsx": "react-jsx",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"]
   },
-  "include": ["mcp/**/*"],
-  "exclude": ["node_modules"]
-} 
+  "include": ["src/mcp/**/*", "src/devtools/**/*", "src/**/*.tsx", "src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
