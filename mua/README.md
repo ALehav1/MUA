@@ -1,3 +1,12 @@
+> **⚠️ PROJECT REWRITE NOTICE (2025-04-15):**
+>
+> This repository was completely rewritten from scratch on April 15, 2025. All previous code, structure, and documentation have been replaced with a new, MCP-compliant foundation focused on:
+> - Automated compliance audit for tests/mocks
+> - Conversational logging for auditability
+> - Modern onboarding and agentic workflow
+>
+> Please see below for the current project structure, compliance requirements, and onboarding instructions.
+
 # Moody’s Underwriting Assistant (MUA)
 
 **MUA** (Moody’s Underwriting Assistant) is an interactive frontend prototype designed to help commercial casualty underwriters manage and analyze insurance submissions efficiently. This project is developed with a strict **UX-first, front-to-back approach** and is structured for easy extension into a full-stack application.
