@@ -34,6 +34,40 @@ npx ts-node src/mcp/server/index.ts
 
 ---
 
+## Local Development: Troubleshooting & Checklist
+
+- **Install dependencies:**
+  ```sh
+  npm install
+  ```
+- **Start all services (frontend + audit backend):**
+  ```sh
+  npm run start
+  ```
+- **If you see a PostCSS or Node loader error:**
+  - Ensure `postcss.config.js` uses CommonJS syntax:
+    ```js
+    module.exports = { /* ... */ }
+    ```
+  - Do **not** use `export default` in this file.
+- **If you see a port-in-use error:**
+  - Find and stop the process with:
+    ```sh
+    lsof -i :<PORT>
+    kill -9 <PID>
+    ```
+  - Or change the port in your config.
+- **Verify audit logging:**
+  - All prompts and responses should be logged to `data/audit.json` when interacting with the app.
+- **Checklist for fresh clone:**
+  1. Clone repo
+  2. Run `npm install`
+  3. Run `npm run start`
+  4. Visit the local URL (see terminal, e.g. http://localhost:3005)
+  5. Confirm audit log is being written
+
+---
+
 ## MCP Server Startup and Conversational Logging (Unified Flow)
 
 ### Unified Startup
