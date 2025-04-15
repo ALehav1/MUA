@@ -3,6 +3,8 @@
 // Run with: node integrationTest.mcp.cjs
 
 const WebSocket = require('ws');
+// Conversational logging for MCP audit trail (Cascade/Windsurf compliance)
+const { logUserPrompt, logAssistantResponse } = require('./src/devtools/useMCP.cjs');
 
 const SERVER_URL = 'ws://localhost:8080';
 
@@ -50,24 +52,27 @@ const tests = [
   }
 ];
 
-function runTests() {
+async function runTests() {
   const ws = new WebSocket(SERVER_URL);
 
-  ws.on('open', () => {
+  ws.on('open', async () => {
     console.log('Connected to MCP server:', SERVER_URL);
-    sendNext(0);
+    await sendNext(0);
   });
 
-  ws.on('message', (data) => {
+  ws.on('message', async (data) => {
     try {
       const msg = JSON.parse(data);
       console.log('Received:', JSON.stringify(msg, null, 2));
+      // Log assistant (Cascade) response for auditability
+      await logAssistantResponse(JSON.stringify(msg));
     } catch (e) {
       console.log('Received (raw):', data);
+      await logAssistantResponse(String(data));
     }
     // Wait a bit before sending the next test
-    setTimeout(() => {
-      sendNext(++runTests.currentTest);
+    setTimeout(async () => {
+      await sendNext(++runTests.currentTest);
     }, 350);
   });
 
@@ -80,7 +85,7 @@ function runTests() {
     console.log('Connection closed.');
   });
 
-  function sendNext(i) {
+  async function sendNext(i) {
     if (i >= tests.length) {
       ws.close();
       console.log('All tests sent.');
@@ -88,6 +93,8 @@ function runTests() {
     }
     const test = tests[i];
     console.log(`\n--- Sending test: ${test.label} ---`);
+    // Log user prompt for auditability
+    await logUserPrompt(JSON.stringify(test.payload));
     ws.send(JSON.stringify(test.payload));
   }
 }

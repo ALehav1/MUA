@@ -287,87 +287,52 @@ Component/hook file does not follow naming convention: useMCP.ts
 
 ---
 
-## Compliance Audit: Test & Mocks Structure
-
-The MCP-driven compliance audit now checks for:
-
-- Existence of `src/__tests__` and `src/__tests__/test-utils/mocks/` directories
-- All mocks are TypeScript files, separated by type (e.g., `ui.tsx`, `api.ts`), and exported via `index.ts`
-- Test files are named `*.test.ts(x)` or `*.spec.ts(x)` and import mocks from the central location
-- No duplicate or inline/hardcoded mock data in test files
-
-### Example Warnings and Recommended Actions
-
-Warnings will be logged in `data/audit.json` with clear TODOs for the agent:
-
-```
-WARNING: Directory src/__tests__/test-utils/mocks/ is missing. TODO: Create and organize mocks by type (ui.tsx, api.ts, etc.).
-WARNING: Test file MyComponent.tsx does not follow naming convention (*.test.ts(x) or *.spec.ts(x)). TODO: Rename for clarity and compliance.
-WARNING: Test file MyComponent.test.ts does not import mocks from central location. TODO: Import mocks from src/__tests__/test-utils/mocks/ only.
-```
-
-Each warning is actionable and intended for the coding agent (Cascade) to resolve.
-
----
-
 ## Conversational Logging (MCP)
 
-Every user prompt and assistant (Cascade) response is now logged in `data/audit.json`:
+Every user prompt and assistant (Cascade) response is logged in `data/audit.json` for full auditability and compliance:
 
 - `type`: `USER_PROMPT` or `ASSISTANT_RESPONSE`
 - `actor`: `USER` or `Cascade`
 - `content`: The prompt or response
 - `timestamp`: ISO format
 
-This enables:
-- Full auditability of decisions, rationale, and coding actions
-- Easier onboarding and reproducibility
-- Traceable history for compliance and reviews
+### How it Works
+- **REST Endpoints:** MCPMetaServer provides `/logPrompt` and `/logResponse` endpoints for logging.
+- **Utilities:**
+  - `src/devtools/useMCP.ts`: For ESM/TypeScript devtools/agentic workflows.
+  - `src/devtools/useMCP.cjs`: For Node.js/CommonJS scripts (e.g., integrationTest.mcp.cjs).
+- **Integration:**
+  - In devtools/test scripts, call `logUserPrompt` before sending a prompt and `logAssistantResponse` after receiving a response.
+  - Example: See `integrationTest.mcp.cjs` for a fully wired agentic audit trail.
+- **Purpose:**
+  - Ensures all agentic actions are traceable for onboarding, compliance, and reproducibility.
+  - Required for Cascade (Windsurf coding agent) and all MCP-enabled automation.
+
+### Logic Flow Diagram (Conversational Logging)
+
+```mermaid
+sequenceDiagram
+    participant Dev as Devtools/Script (Node.js)
+    participant MCP as MCPMetaServer (REST)
+    participant Audit as data/audit.json
+    Dev->>MCP: POST /logPrompt (user prompt)
+    MCP->>Audit: Append USER_PROMPT entry
+    MCP-->>Dev: (ack)
+    Dev->>MCP: send prompt to agent (WebSocket)
+    MCP-->>Dev: agent response (WebSocket)
+    Dev->>MCP: POST /logResponse (assistant response)
+    MCP->>Audit: Append ASSISTANT_RESPONSE entry
+    MCP-->>Dev: (ack)
+```
 
 ---
 
-## Mock Data Structure
+## Audit/Compliance File Purposes
 
-All UI is powered by `mockData.json`, an array of submission objects. Example structure:
-
-```json
-[
-  {
-    "submissionId": "SUB12345",
-    "insuredName": "Acme Manufacturing Inc.",
-    "address": "123 Industrial Way, Anytown, USA",
-    "status": "New",
-    "dateReceived": "2025-04-13",
-    "lineOfBusiness": "General Liability & Property",
-    "broker": "Marsh McLennan",
-    "enrichmentData": { ... },
-    "riskAnalysis": {
-      "overallScore": 72,
-      "components": [ ... ],
-      "narrativeSummary": "The account exhibits low financial risk...",
-      "keyFlags": [ ... ],
-      "detailedData": { ... }
-    },
-    "quoteRecommendation": {
-      "status": "Pending Review",
-      "coverage": [ ... ],
-      "keyConditions": [ ... ],
-      "premiumIndication": { ... },
-      "aiConfidence": "Medium"
-    },
-    "interactionLog": [
-      {
-        "question": "Why is the CAT risk high?",
-        "answer": "The risk score reflects high flood exposure (RMS Zone A)..."
-      },
-      {
-        "question": "What is the impact of the PFAS alert?",
-        "answer": "The Praedicat model indicates a growing potential for liability claims..."
-      }
-    ]
-  }
-]
-```
+- `src/devtools/useMCP.ts`: TypeScript/ESM logging utility for devtools/agentic workflows.
+- `src/devtools/useMCP.cjs`: CommonJS logging utility for Node.js scripts.
+- `integrationTest.mcp.cjs`: Example of full conversational logging in agentic integration tests.
+- `data/audit.json`: Audit log for all MCP actions, prompts, and responses.
 
 ---
 

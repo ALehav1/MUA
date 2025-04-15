@@ -41,7 +41,36 @@ The Model Context Protocol (MCP) is a meta-brain architecture for project manage
 
 ---
 
-## Quickstart Checklist (Any Project)
+## Node.js Module System: CommonJS vs ESM (UPDATED)
+
+### What Changed?
+- The project now uses **CommonJS** for all backend/server code.
+- All local imports use the CommonJS-compatible form (no `.js` extensions, just the module name).
+- This avoids ESM/TypeScript loader errors and makes development and onboarding easier.
+
+### Why CommonJS?
+- CommonJS is the most widely supported and reliable module system for Node.js projects.
+- ESM (ECMAScript Modules) is more modern, but can be tricky to set up in Node.js, especially with TypeScript.
+- For most backend/server code, there is no practical difference for developers.
+- If you ever need to switch to ESM in the future (for package publishing or browser compatibility), see the [project history](#project-history) for migration notes.
+
+### What Do I Need To Do?
+- Use `import ... from '...'` for all imports, but do **not** add `.js` extensions to local files.
+- Run the server with:
+  ```bash
+  npx ts-node src/mcp/server/index.ts
+  ```
+- You do **not** need to worry about ESM vs CommonJS unless you hit a specific package compatibility issue.
+
+### Troubleshooting
+If you see errors about unknown file extensions or ESM loaders, make sure:
+- `package.json` contains: `"type": "commonjs"`
+- `tsconfig.json` contains: `"module": "commonjs"`
+- All local imports omit the `.js` extension (e.g., `import foo from './foo'` not `import foo from './foo.js'`)
+
+---
+
+## Quickstart Checklist (UPDATED)
 
 1. **Clone your project & install dependencies**
    ```bash
@@ -52,14 +81,18 @@ The Model Context Protocol (MCP) is a meta-brain architecture for project manage
 2. **Add/verify MCP directories and files**
    - Place all MCP files in `mcp/` or `data/`.
    - Create `data/plan.json`, `data/guidelines.json`, `data/audit.json` as needed.
-3. **Start the MCPMetaServer**
+3. **Start the MCP Server (Unified Startup)**
    ```bash
-   # Compile if needed
-   npx tsc mcp/server/MCPMetaServer.ts --outDir dist/mcp/server --module commonjs --esModuleInterop
-   # Run as CommonJS (use .cjs extension if needed)
-   node dist/mcp/server/MCPMetaServer.cjs
+   npx ts-node src/mcp/server/index.ts
    ```
-   - Default server port: `http://localhost:8081`
+   - This starts both the WebSocket server (8080) and REST audit server (8081).
+   - You should see logs like:
+     ```
+     [MCPServer] WebSocketServer started on ws://localhost:8080
+     MCP server started at ws://localhost:8080
+     [MCPMetaServer] REST server running on http://localhost:8081
+     ```
+   - If you see loader/ESM errors, double-check that your project is configured for CommonJS (see above).
 4. **Test Endpoints (REST API)**
    ```bash
    curl http://localhost:8081/plan
@@ -79,7 +112,7 @@ The Model Context Protocol (MCP) is a meta-brain architecture for project manage
 
 ---
 
-## MCP Server (Backend) Setup & Troubleshooting
+## MCP Server (Backend) Setup & Troubleshooting (UPDATED)
 
 ### Starting the MCP Server
 
@@ -87,26 +120,37 @@ The Model Context Protocol (MCP) is a meta-brain architecture for project manage
    ```bash
    npm install
    ```
-2. **Start the MCP server:**
+2. **Start the MCP server (Unified Startup):**
    ```bash
-   node --loader ts-node/esm src/mcp/server/index.ts
+   npx ts-node src/mcp/server/index.ts
    ```
    - You should see logs like:
      ```
      [MCPServer] WebSocketServer started on ws://localhost:8080
      MCP server started at ws://localhost:8080
+     [MCPMetaServer] REST server running on http://localhost:8081
      ```
-   - If you see loader/ESM errors, upgrade ts-node and TypeScript, and ensure your tsconfig.json uses `module` and `moduleResolution` set to `NodeNext`.
+   - If you see loader/ESM errors, double-check that your project is configured for CommonJS (see above).
 
 3. **Shut down the server:**
    - Press `Ctrl+C` in the terminal; you should see `Shutting down MCP server...`.
 
 ### Troubleshooting
 - **ExperimentalWarning:** This is expected with Node’s loader API and does not affect functionality.
-- **Port in use:** Run `lsof -i :8080` and `kill <PID>`.
+- **Port in use:** Run `lsof -i :8080` or `lsof -i :8081` and `kill <PID>`.
 - **Cannot find module:** Check all import paths and tsconfig.json.
 - **No startup log:** Ensure logging is present in `src/mcp/server/index.ts`.
 - **Frontend not connecting:** Confirm frontend uses `ws://localhost:8080`.
+- **Unknown file extension or ESM loader error:** Ensure you are using CommonJS (see above).
+
+---
+
+## Project Structure (UPDATED)
+
+- `src/mcp/server/index.ts`: Unified entrypoint. Starts both servers. **Only run this file.**
+- `src/mcp/server/MCPServer.ts`: WebSocket protocol server (8080).
+- `src/mcp/server/MCPMetaServer.ts`: Express REST server (8081) for audit/compliance. Exported as an app, not run directly.
+- `README.md`: Project-specific documentation and compliance notes. Always keep in sync with this file.
 
 ---
 
@@ -148,6 +192,42 @@ sequenceDiagram
 - Always check README.md and MCP_SETUP.md for onboarding and compliance before making changes.
 - All server actions and audit logs are in `data/audit.json` for traceability.
 - Keep logic flow diagrams and onboarding steps up to date with every major change.
+
+---
+
+## MCP Conversational Logging & Audit Trail
+
+### Overview
+- All agentic workflows (including Cascade/Windsurf) must log every user prompt and assistant response for auditability.
+- Logs are written to `data/audit.json` via REST endpoints provided by MCPMetaServer.
+
+### How to Log Prompts & Responses
+- **TypeScript/ESM:** Use `src/devtools/useMCP.ts` (`logUserPrompt`, `logAssistantResponse`).
+- **Node.js/CommonJS:** Use `src/devtools/useMCP.cjs` for test/automation scripts.
+- **REST Endpoints:**
+    - `POST /logPrompt` (body: `{ content: string }`)
+    - `POST /logResponse` (body: `{ content: string }`)
+
+### Example (Node.js script)
+
+```js
+const { logUserPrompt, logAssistantResponse } = require('./src/devtools/useMCP.cjs');
+
+async function main() {
+  await logUserPrompt('Prompt text here');
+  // ... send to agent, get response ...
+  await logAssistantResponse('Response text here');
+}
+main();
+```
+
+### Compliance Requirements
+- All agentic/devtools scripts must log prompts/responses for onboarding, reproducibility, and compliance.
+- See `integrationTest.mcp.cjs` for a full example.
+
+### Troubleshooting
+- If logs do not appear in `data/audit.json`, ensure MCPMetaServer is running and accessible at `localhost:8081`.
+- Check for errors in the script output (all logging errors are printed to the console).
 
 ---
 
@@ -212,4 +292,4 @@ node src/devtools/auditCompliance.mcp.cjs
 
 ---
 
-*Last updated: 2025-04-15T10:12:56-04:00*
+*Last updated: 2025-04-15T12:47:58-04:00*

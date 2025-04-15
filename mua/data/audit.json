@@ -47,5 +47,19 @@
     "component": "auditCompliance.mcp.cjs",
     "rationale": "Compliance audit PASSED: All checks passed.",
     "timestamp": "2025-04-15T14:49:21.250Z"
+  },
+  {
+    "type": "USER_PROMPT",
+    "actor": "USER",
+    "content": "Example test prompt for selective logging demo.",
+    "timestamp": "2025-04-15T18:06:36.112Z",
+    "debug": true
+  },
+  {
+    "type": "ASSISTANT_RESPONSE",
+    "actor": "Cascade",
+    "content": "Example summarized response for selective logging demo. This is the first 200 characters only...",
+    "timestamp": "2025-04-15T18:06:36.127Z",
+    "debug": true
   }
 ]

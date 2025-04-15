@@ -24,6 +24,9 @@ const GUIDELINES_PATH = path.join(DATA_DIR, 'guidelines.json');
 const AUDIT_PATH = path.join(DATA_DIR, 'audit.json');
 const README_PATH = path.resolve(__dirname, '../../../README.md');
 
+console.log(`[MCPMetaServer] AUDIT_PATH: ${AUDIT_PATH}`);
+console.log(`[MCPMetaServer] process.cwd(): ${process.cwd()}`);
+
 function safeReadJSON(file: string, fallback: any) {
   try {
     return JSON.parse(fs.readFileSync(file, 'utf-8'));
@@ -52,7 +55,7 @@ const app = express();
 app.use(express.json());
 
 // REST Endpoints
-app.get('/plan', (req, res) => {
+app.get('/plan', (_req, res) => {
   res.json(safeReadJSON(PLAN_PATH, { objectives: [], steps: [], lastUpdated: null }));
 });
 app.post('/plan', (req, res) => {
@@ -63,7 +66,7 @@ app.post('/plan', (req, res) => {
   res.json({ success: true });
 });
 
-app.get('/guidelines', (req, res) => {
+app.get('/guidelines', (_req, res) => {
   res.json(safeReadJSON(GUIDELINES_PATH, { rules: [], lastUpdated: null }));
 });
 app.post('/guidelines', (req, res) => {
@@ -74,7 +77,7 @@ app.post('/guidelines', (req, res) => {
   res.json({ success: true });
 });
 
-app.get('/audit', (req, res) => {
+app.get('/audit', (_req, res) => {
   res.json(safeReadJSON(AUDIT_PATH, []));
 });
 app.post('/audit', (req, res) => {
@@ -93,12 +96,20 @@ app.post('/logPrompt', (req, res) => {
     type: 'USER_PROMPT',
     actor: 'USER',
     content: req.body.content,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    debug: true // DEBUG marker for this session
   };
-  const audit = safeReadJSON(AUDIT_PATH, []);
-  audit.push(entry);
-  safeWriteJSON(AUDIT_PATH, audit);
-  res.json({ success: true });
+  try {
+    console.log('[logPrompt] Received:', entry);
+    console.log('[logPrompt] Writing to:', AUDIT_PATH);
+    const audit = safeReadJSON(AUDIT_PATH, []);
+    audit.push(entry);
+    safeWriteJSON(AUDIT_PATH, audit);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[logPrompt] ERROR:', err);
+    res.status(500).json({ success: false, error: String(err) });
+  }
 });
 // Log an assistant response
 app.post('/logResponse', (req, res) => {
@@ -106,15 +117,23 @@ app.post('/logResponse', (req, res) => {
     type: 'ASSISTANT_RESPONSE',
     actor: 'Cascade',
     content: req.body.content,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    debug: true // DEBUG marker for this session
   };
-  const audit = safeReadJSON(AUDIT_PATH, []);
-  audit.push(entry);
-  safeWriteJSON(AUDIT_PATH, audit);
-  res.json({ success: true });
+  try {
+    console.log('[logResponse] Received:', entry);
+    console.log('[logResponse] Writing to:', AUDIT_PATH);
+    const audit = safeReadJSON(AUDIT_PATH, []);
+    audit.push(entry);
+    safeWriteJSON(AUDIT_PATH, audit);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[logResponse] ERROR:', err);
+    res.status(500).json({ success: false, error: String(err) });
+  }
 });
 
-app.get('/readme', (req, res) => {
+app.get('/readme', (_req, res) => {
   try {
     res.type('text/markdown').send(fs.readFileSync(README_PATH, 'utf-8'));
   } catch (e) {
@@ -122,7 +141,7 @@ app.get('/readme', (req, res) => {
   }
 });
 
-app.get('/structure', (req, res) => {
+app.get('/structure', (_req, res) => {
   const structure = getDirectoryStructure(path.resolve(__dirname, '../../../'));
   res.json(structure);
 });
@@ -151,17 +170,14 @@ chokidar.watch([
   ignored: /node_modules|\\.git|dist/,
   ignoreInitial: true,
   persistent: true
-}).on('all', (event, filePath) => {
+}).on('all', (_event, _filePath) => {
   // Could push to WebSocket clients, log changes, etc.
   // For now, just log the event for audit/debug
-  // console.log(`[Watcher] ${event}: ${filePath}`);
+  // console.log(`[Watcher] ${_event}: ${_filePath}`);
 });
 
-// Start REST server
-const PORT = 8081;
-app.listen(PORT, () => {
-  console.log(`[MCPMetaServer] REST server running on http://localhost:${PORT}`);
-});
+// Export the Express app for unified startup (index.js)
+export default app;
 
 // ---
 // Annotated for audit, extensibility, and agent orchestration.
