@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "mcp-server": "ts-node src/mcp/server/index.ts",
+    "mcp-server": "ts-node --loader ts-node/esm src/mcp/server/index.ts",
     "start": "concurrently \"npm run dev\" \"npm run mcp-server\"",
     "test": "jest",
     "test:watch": "jest --watch"

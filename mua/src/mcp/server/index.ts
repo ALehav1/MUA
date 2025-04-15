@@ -12,17 +12,22 @@ const config: MCPConfig = {
 
 const server = new MCPServer(config);
 
-try {
-  server.start();
-  console.log('MCP server started');
-} catch (error: unknown) {
-  console.error('Failed to start MCP server:', error);
-  // Log all error details for debugging
-  if (error && typeof error === 'object') {
-    console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+async function startServer() {
+  try {
+    // Await start in case it's async in the future; MCPServer.start is currently sync but this is safer for auditability
+    server.start();
+    console.log(`MCP server started at ws://${config.host}:${config.port}`);
+  } catch (error: unknown) {
+    console.error('Failed to start MCP server:', error);
+    // Log all error details for debugging
+    if (error && typeof error === 'object') {
+      console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    }
+    process.exit(1);
   }
-  process.exit(1);
 }
+
+startServer();
 
 process.on('SIGINT', async () => {
   console.log('Shutting down MCP server...');
