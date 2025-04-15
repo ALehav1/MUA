@@ -79,6 +79,37 @@ The Model Context Protocol (MCP) is a meta-brain architecture for project manage
 
 ---
 
+## MCP Server (Backend) Setup & Troubleshooting
+
+### Starting the MCP Server
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+2. **Start the MCP server:**
+   ```bash
+   node --loader ts-node/esm src/mcp/server/index.ts
+   ```
+   - You should see logs like:
+     ```
+     [MCPServer] WebSocketServer started on ws://localhost:8080
+     MCP server started at ws://localhost:8080
+     ```
+   - If you see loader/ESM errors, upgrade ts-node and TypeScript, and ensure your tsconfig.json uses `module` and `moduleResolution` set to `NodeNext`.
+
+3. **Shut down the server:**
+   - Press `Ctrl+C` in the terminal; you should see `Shutting down MCP server...`.
+
+### Troubleshooting
+- **ExperimentalWarning:** This is expected with Node’s loader API and does not affect functionality.
+- **Port in use:** Run `lsof -i :8080` and `kill <PID>`.
+- **Cannot find module:** Check all import paths and tsconfig.json.
+- **No startup log:** Ensure logging is present in `src/mcp/server/index.ts`.
+- **Frontend not connecting:** Confirm frontend uses `ws://localhost:8080`.
+
+---
+
 ## Protocol Workflow (General)
 
 1. **Before any codebase change:**
@@ -92,18 +123,17 @@ The Model Context Protocol (MCP) is a meta-brain architecture for project manage
 
 ```mermaid
 sequenceDiagram
-    participant Agent as Agent/Human
-    participant MCP as MCPMetaServer
+    participant User as USER/Agent
+    participant UI as Frontend (React)
+    participant MCP as MCP Server (ws://localhost:8080)
 
-    Agent->>MCP: GET_PLAN / GET_GUIDELINES / GET_README / GET_STRUCTURE
-    MCP-->>Agent: Returns plan, guidelines, README, structure
+    User->>UI: Interacts with UI
+    UI->>MCP: Sends/receives messages (WebSocket)
+    MCP-->>UI: Responds with plan, guidelines, audit, etc.
+    UI-->>User: Updates state/UX
 
-    Agent->>MCP: POST /audit (proposed change, rationale)
-    MCP-->>Agent: Action logged
-
-    Agent->>FileSystem: Make change (create/modify/delete file)
-    Agent->>MCP: POST /audit (change completed)
-    MCP-->>Agent: Action logged
+    User->>MCP: Direct API/audit actions (optional)
+    MCP-->>User: Logs, compliance, onboarding info
 ```
 
 ---
@@ -115,6 +145,9 @@ sequenceDiagram
 - **Log all actions and rationale for full auditability.**
 - **Document component purposes, relationships, and rationale in your project README.**
 - **Update documentation with every protocol or structural change.**
+- Always check README.md and MCP_SETUP.md for onboarding and compliance before making changes.
+- All server actions and audit logs are in `data/audit.json` for traceability.
+- Keep logic flow diagrams and onboarding steps up to date with every major change.
 
 ---
 

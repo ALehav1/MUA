@@ -182,6 +182,74 @@ mua/
 
 ---
 
+## MCP Server (Backend) Setup & Troubleshooting
+
+### Starting the MCP Server
+
+1. **Ensure you are using the correct Node.js, TypeScript, and ts-node versions:**
+   - Node.js: v18.x or later (see .nvmrc if present)
+   - TypeScript: latest (see package.json)
+   - ts-node: latest (see package.json)
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Start the MCP server:**
+   ```bash
+   node --loader ts-node/esm src/mcp/server/index.ts
+   ```
+   - You should see:
+     ```
+     [MCPServer] WebSocketServer started on ws://localhost:8080
+     MCP server started at ws://localhost:8080
+     ```
+   - If you see errors about loaders or ESM, ensure ts-node and TypeScript are up to date and that your tsconfig.json uses `module` and `moduleResolution` set to `NodeNext`.
+
+4. **Shut down the server:**
+   - Press `Ctrl+C` in the terminal; you should see `Shutting down MCP server...`.
+
+### Troubleshooting
+- **ExperimentalWarning:** This is expected due to Node’s loader API. It does not affect functionality but may change in future Node versions.
+- **Port in use:** Run `lsof -i :8080` and `kill <PID>` to free the port.
+- **Cannot find module errors:** Ensure all paths and aliases are correct and that `tsconfig.json` is properly configured.
+- **No startup log:** Ensure the entrypoint logs are present as shown above.
+- **Frontend not connecting:** Confirm the frontend is using `ws://localhost:8080` as the MCP WebSocket endpoint.
+
+### Auditability & Compliance
+- All MCP server actions, prompts, and responses are logged in `data/audit.json`.
+- See the [MCP_SETUP.md](./MCP_SETUP.md) for protocol, audit, and onboarding details.
+
+---
+
+## Logic Flow Diagram (Updated)
+
+```mermaid
+sequenceDiagram
+    participant User as USER/Agent
+    participant UI as Frontend (React)
+    participant MCP as MCP Server (ws://localhost:8080)
+
+    User->>UI: Interacts with UI
+    UI->>MCP: Sends/receives messages (WebSocket)
+    MCP-->>UI: Responds with plan, guidelines, audit, etc.
+    UI-->>User: Updates state/UX
+
+    User->>MCP: Direct API/audit actions (optional)
+    MCP-->>User: Logs, compliance, onboarding info
+```
+
+---
+
+## Recent Architectural Decisions & Rationale
+
+- **MCP server is now started via Node/ts-node ESM loader for full TypeScript + ESM support.**
+- **All startup, error, and shutdown events are logged for auditability and onboarding.**
+- **All contributors should check README.md and MCP_SETUP.md for up-to-date onboarding and compliance instructions.**
+
+---
+
 ## MCP-Driven Compliance Audit Tool
 
 This project includes an automated compliance audit script to ensure your directory structure and naming conventions match project guidelines and documentation.
