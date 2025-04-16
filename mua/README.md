@@ -1,16 +1,132 @@
-# MCP Audit Logging and Agentic Workflow
+# MUA: Modern Underwriting Agent
 
 ---
 
-# Table of Contents
+## Overview
 
-- [MCPMetaServer Setup and Agentic Workflow](#mcpmetaserver-setup-and-agentic-workflow)
-- [MCP Server Startup and Conversational Logging (Unified Flow)](#mcp-server-startup-and-conversational-logging-unified-flow)
-- [Selective Logging of Prompts and Responses (Cascade Agent Chat)](#selective-logging-of-prompts-and-responses-cascade-agent-chat)
-- [MetaMCP (MCPMetaServer) Protocol and Usage](#metamcp-mcpmetaserver-protocol-and-usage)
+MUA is a modular, agentic insurance application designed for rapid prototyping and compliance-driven development. It leverages agent workflows, project guidelines, and audit trails to ensure clarity, transparency, and extensibility.
+
+---
+
+## MCP: What It Actually Does (Current State)
+
+### Purpose (Current Implementation)
+
+The MCP server is a **passive tool** in this project.
+
+- It serves project metadata and documentation (`plan.json`, `guidelines.json`, `README.md`) via REST/WebSocket endpoints.
+- It collects audit logs from the insurance app (user submissions, AI recommendations) and writes them to `data/audit.json`.
+- **It is NOT integrated with the coding agent (Cascade)** and does not enforce guidelines, review changes, or provide agentic context automatically.
+- All enforcement of process, onboarding, and guidelines is by convention and documentation (README, MCP_SETUP.md), not by the MCP server.
+
+### When to Use MCP (Current Value)
+
+- If you need a machine-readable API for project plan/guidelines (for future automation or bots).
+- If you want to keep an audit log of app actions (not needed for this project, but implemented).
+- If you want a central place to store project meta-data (for future extensibility).
+
+### When MCP Is Superfluous
+
+- If you do not need audit logging or machine APIs.
+- If you and your coding agent (Cascade) can fully leverage README, docs, and semantic codebase search.
+- If you want to keep the project stack minimal and reduce maintenance overhead.
+
+### Limitations (Current State)
+
+- MCP does **not** enforce or mediate project changes.
+- MCP is **not** actively used by Cascade or Windsurf CLI for agentic context or logging.
+- All guideline/process enforcement is manual, via documentation and memory.
+
+### Future Directions (If Needed)
+
+- MCP could be extended to provide validation, real-time context, or automated enforcement for agentic workflows.
+- Could serve as a coordination layer for multi-agent or distributed development.
+
+---
+
+## Table of Contents
+
+- [Project Overview](#overview)
+- [MCP: What It Actually Does (Current State)](#mcp-what-it-actually-does-current-state)
+- [Project Structure](#project-structure)
+- [Setup and Installation](#setup-and-installation)
+- [Development Workflow](#development-workflow)
+- [Testing](#testing)
 - [Linting and Formatting](#linting-and-formatting)
 - [Changelog and Audit Trail](#changelog-and-audit-trail)
 - [See Also](#see-also)
+
+---
+
+## Project Structure
+
+```text
+mua/
+├── README.md             # Project documentation (source of truth)
+├── MCP_SETUP.md          # MCP onboarding and setup guide
+├── data/
+│   ├── plan.json         # Project plan (machine-readable)
+│   ├── guidelines.json   # Project guidelines (machine-readable)
+│   └── audit.json        # Audit log (user/AI actions)
+├── src/
+│   ├── mcp/              # MCP server implementation
+│   └── ...               # App source code
+└── ...
+```
+
+---
+
+## Setup and Installation
+
+Refer to [MCP_SETUP.md](./MCP_SETUP.md) for detailed onboarding and troubleshooting.
+
+---
+
+## Development Workflow
+
+1. **Review the [README.md](./README.md) and [MCP_SETUP.md](./MCP_SETUP.md) before making changes.**
+2. **Document planned changes and update the README first.**
+3. **Keep the README as the source of truth for structure, rationale, and guidelines.**
+4. **Use semantic codebase search and audit logs for context.**
+
+---
+
+## Testing
+
+- All test mocks are in `src/__tests__/test-utils/mocks/`.
+- Use TypeScript for type safety and import mocks from central locations.
+- Use `beforeAll`/`beforeEach` for setup and group tests with `describe` blocks.
+- Test user interactions, state changes, and error handling.
+
+---
+
+## Linting and Formatting
+
+- Use `eslint` and `prettier` for code quality.
+- Fix all lint warnings before merging changes.
+- For markdown, use `markdownlint` and follow these conventions:
+  - One top-level heading (`#`) per document.
+  - Blank lines before/after headings, lists, and code blocks.
+  - No trailing punctuation in headings.
+  - No bare URLs—use markdown links.
+  - No duplicate headings.
+  - Heading levels increment by one at a time.
+
+---
+
+## Changelog and Audit Trail
+
+- All major changes are documented in the audit log (`data/audit.json`).
+- Use REST endpoints to log user prompts and assistant responses if MCP is active.
+
+---
+
+## See Also
+
+- [MCP_SETUP.md](./MCP_SETUP.md): MCP onboarding and troubleshooting
+- [plan.json](./data/plan.json): Project plan (machine-readable)
+- [guidelines.json](./data/guidelines.json): Project guidelines (machine-readable)
+- [audit.json](./data/audit.json): Audit log
 
 ---
 
@@ -65,6 +181,38 @@ npx ts-node src/mcp/server/index.ts
   3. Run `npm run start`
   4. Visit the local URL (see terminal, e.g. http://localhost:3005)
   5. Confirm audit log is being written
+
+---
+
+## Audit Logging & Compliance (UPDATED)
+
+MUA now logs **both user prompts and assistant (AI) responses** for every submission, ensuring full compliance and auditability.
+
+#### How Audit Logging Works
+- **User Prompt**: When a user submits a new insurance application, the form data is logged via `logUserPrompt`.
+- **Assistant Response**: When a submission is viewed, the AI's recommendation/summary is logged via `logAssistantResponse` (first 200 chars).
+- All logs are written to `data/audit.json` by the MCPMetaServer REST API.
+
+#### Logic Flow Diagram
+```mermaid
+flowchart TD
+    A[User submits application] --> B[logUserPrompt]
+    B --> C[audit.json]
+    D[User views submission dossier] --> E[logAssistantResponse (AI summary)]
+    E --> C
+```
+
+#### Relevant Files
+- `src/screens/NewSubmission.tsx`: Logs user prompt on submission.
+- `src/screens/SubmissionDossier.tsx`: Logs AI summary when viewing a submission.
+- `src/devtools/useMCP.ts`: Logging utilities.
+- `data/audit.json`: Audit log file (JSON).
+- `MCP_SETUP.md`: Setup and compliance details.
+
+#### Developer Notes
+- Logging is robust and errors are surfaced in the browser console.
+- Only the first 200 characters of the AI summary are logged for compliance.
+- If you see no log, check that both the app and MCPMetaServer are running.
 
 ---
 
@@ -382,22 +530,5 @@ graph TD
 
 - `src/__tests__/README.md` for test structure and best practices.
 - All config and logic is heavily annotated in code for onboarding and audit.
-
----
-
-## Linting and Formatting
-
-- This project uses ESLint and markdownlint for code and documentation quality.
-- To check/fix markdown formatting issues, run:
-
-```sh
-npx markdownlint-cli2 "**/*.md"
-```
-
-- To check/fix code linting issues, run:
-
-```sh
-npm run lint
-```
 
 ---

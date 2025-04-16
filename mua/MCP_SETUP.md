@@ -195,39 +195,45 @@ sequenceDiagram
 
 ---
 
-## MCP Conversational Logging & Audit Trail
+## MCP Conversational Logging & Audit Trail (UPDATED)
 
-### Overview
-- All agentic workflows (including Cascade/Windsurf) must log every user prompt and assistant response for auditability.
-- Logs are written to `data/audit.json` via REST endpoints provided by MCPMetaServer.
+MUA now logs **both user prompts and assistant responses** for every submission, ensuring a complete audit trail for compliance.
 
-### How to Log Prompts & Responses
-- **TypeScript/ESM:** Use `src/devtools/useMCP.ts` (`logUserPrompt`, `logAssistantResponse`).
-- **Node.js/CommonJS:** Use `src/devtools/useMCP.cjs` for test/automation scripts.
-- **REST Endpoints:**
-    - `POST /logPrompt` (body: `{ content: string }`)
-    - `POST /logResponse` (body: `{ content: string }`)
+### Logging Process
+- **User Prompt**: Logged via `logUserPrompt` on form submission.
+- **Assistant Response**: Logged via `logAssistantResponse` when a submission is viewed (first 200 chars of AI summary).
+- Both log entries are written to `data/audit.json` by the MCPMetaServer.
 
-### Example (Node.js script)
-
-```js
-const { logUserPrompt, logAssistantResponse } = require('./src/devtools/useMCP.cjs');
-
-async function main() {
-  await logUserPrompt('Prompt text here');
-  // ... send to agent, get response ...
-  await logAssistantResponse('Response text here');
-}
-main();
+### Logic Flow Diagram
+```mermaid
+flowchart TD
+    A[User submits application] --> B[logUserPrompt]
+    B --> C[audit.json]
+    D[User views submission dossier] --> E[logAssistantResponse (AI summary)]
+    E --> C
 ```
 
-### Compliance Requirements
-- All agentic/devtools scripts must log prompts/responses for onboarding, reproducibility, and compliance.
-- See `integrationTest.mcp.cjs` for a full example.
+### Example (React UI)
+```typescript
+// src/screens/SubmissionDossier.tsx
+useEffect(() => {
+  if (!submission) return;
+  let aiSummary = '';
+  if (submission.quoteRecommendation && submission.quoteRecommendation.coverage) {
+    aiSummary = submission.quoteRecommendation.coverage.map(cov => `${cov.type}: Limit $${cov.limit}, Premium $${cov.premium}`).join('; ');
+  }
+  if (!aiSummary && submission.riskAnalysis) {
+    aiSummary = `Risk Score: ${submission.riskAnalysis.overallScore}`;
+  }
+  if (aiSummary) {
+    logAssistantResponse(aiSummary.slice(0, 200));
+  }
+}, [submission]);
+```
 
 ### Troubleshooting
-- If logs do not appear in `data/audit.json`, ensure MCPMetaServer is running and accessible at `localhost:8081`.
-- Check for errors in the script output (all logging errors are printed to the console).
+- If you do not see both entries in `data/audit.json`, ensure both the app and MCPMetaServer are running.
+- Errors are logged to the browser console for traceability.
 
 ---
 
